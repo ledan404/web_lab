@@ -2,7 +2,7 @@ import { PesPatron } from "../assets/images";
 let title = "PesPatron";
 const Item = () => {
   return (
-  <div className="w-96">
+    <div className="w-96">
       <img
       src={PesPatron}
       width={325}

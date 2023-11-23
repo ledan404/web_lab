@@ -1,3 +1,4 @@
+import { Link, NavLink } from 'react-router-dom';
 import { logo } from '../assets/images'
 const Header = () => {
   return (
@@ -13,8 +14,8 @@ const Header = () => {
           />
         </a>
         <ul className="flex-1 flex justify-center items-center gap-16">
-        <li><a href="/" className="">Home</a></li>
-        <li><a href="/catalog">Catalog</a></li>
+        <li><NavLink exact to="/Home">Home</NavLink></li>
+        <li><NavLink exact to="/Catalog">Catalog</NavLink></li>
         <li><a href="/cart">Cart</a></li>
       </ul>
     </nav>      
