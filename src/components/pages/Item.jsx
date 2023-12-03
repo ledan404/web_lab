@@ -4,7 +4,7 @@ import { PesPatron } from "../../images";
 
 function ItemPage({ dogs }) {
   const { id } = useParams();
-  const itemId = parseInt(id);
+  const itemId = id;
   const [dog, setDog] = useState();
   const [price, setPrice] = useState(0);
 
@@ -36,7 +36,7 @@ function ItemPage({ dogs }) {
         </div>
         <div className="py-6">
           <div className="flex justify-between mx-auto max-w-screen-xl bg-white border-10 border-dadada rounded-2xl p-10">
-            <p className="text-black text-2xl font-semibold mb-4">Price: ${price}</p>
+            <p className="text-black text-2xl font-semibold mb-4">Price: ${dog.price}</p>
             <div className="flex items-center">
               <a href="/catalog" className="py-2 px-6 border-2 rounded-10 cursor-pointer focus:outline-none">
                 Go back

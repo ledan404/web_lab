@@ -1,3 +1,4 @@
+import { getSortedWithFilter } from "../../api";
 // Apply.js
 export const Apply = ({ children, onClick }) => (
     <button
@@ -8,33 +9,22 @@ export const Apply = ({ children, onClick }) => (
     </button>
   );
   
-  export const applyFilters = (dogs, selectedFilters, catalogSearch) => {
+  export const applyFilters = async (dogs, selectedFilters, catalogSearch) => {
+    const filter = selectedFilters.find(filter => filter.value !== "");
+    
     let sortedDogs = [...dogs];
-  
+
+    if (filter) {
+        const data = await getSortedWithFilter(filter);
+        sortedDogs = data;
+    }
+
     if (catalogSearch) {
-      sortedDogs = sortedDogs.filter((dog) => {
-        return dog.name.toLowerCase().includes(catalogSearch.toLowerCase());
-      });
+        sortedDogs = sortedDogs.filter(dog => 
+            dog.name.toLowerCase().includes(catalogSearch.toLowerCase())
+        );
     }
-  
-    if (selectedFilters[0].value === "Mina") {
-      sortedDogs.sort((dogL, dogR) => {
-        return dogR.Mina - dogL.Mina;
-      });
-    }
-  
-    if (selectedFilters[1].value === "paws") {
-      sortedDogs.sort((dogL, dogR) => {
-        return dogR.paws - dogL.paws;
-      });
-    }
-  
-    if (selectedFilters[2].value === "price") {
-      sortedDogs.sort((dogL, dogR) => {
-        return dogR.price - dogL.price;
-      });
-    }
-  
+
     return sortedDogs;
-  };
-  
+}
+
