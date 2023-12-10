@@ -7,9 +7,10 @@ import CatalogPage from "./components/pages/Catalog";
 import CartPage from "./components/pages/Cart";
 import ItemPage from "./components/pages/Item";
 import { useState, useEffect } from "react";
-import { DogsData } from "./components/pages/catalog-logic/logic";
 import { getDogs } from "./components/api";
-
+import { Provider } from "react-redux";
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './components/store';
 function App() {
   const [dogs, setDogs] = useState([]);
   const [catalogSearch, setCatalogSearch] = useState("");
@@ -19,8 +20,10 @@ function App() {
   useEffect(() => {
     getDogs().then((DogsData) => setDogs(DogsData));
   }, []);
-
+  
   return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
     <BrowserRouter>
       <Header catalogSearchChange={handleCatalogSearchChange} />
       <Routes>
@@ -34,6 +37,8 @@ function App() {
       </Routes>
       <Footer />
     </BrowserRouter>
+    </PersistGate>
+    </Provider>
   );
 }
 

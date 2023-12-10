@@ -1,16 +1,19 @@
 import { Route, Routes } from 'react-router-dom';
 import { Logo } from '../images';
+import { useNavigate } from 'react-router-dom';
+
 
 const Header = ({ catalogSearchChange }) => {
+  const navigate = useNavigate();
   return (
     <header className="flex items-center border-b-10 border-gray-300 px-5 md:px-10 py-2">
       <div className="w-1/3 flex items-center">
         <img src={Logo} width={80} height={80} />
       </div>
       <nav className="flex items-center justify-center flex-1">
-        <a href="/" className="mx-4">Home</a>
-        <a href="/catalog" className="mx-4">Catalog</a>
-        <a href="/cart" className="mx-4">Cart</a>
+        <button onClick={() => navigate('/')} className="mx-4">Home</button>
+        <button onClick={() => navigate('/catalog')} className="mx-4">Catalog</button>
+        <button onClick={() => navigate('/cart')}className="mx-4">Cart</button>
       </nav>
       <div className="w-1/3 flex items-center justify-center">
         <Routes>
