@@ -1,8 +1,11 @@
 import {
-  renderItemsList,
-  clearInputs,
-  dogs,
-} from "./dom_util.js"
+  getAllDogs,
+  getDogById,
+  createDog,
+  updateDog,
+  deleteDog,
+} from "./api.js";
+import { renderItemsList, clearInputs, dogs } from "./dom_util.js";
 
 const searchButton = document.getElementById("search_button");
 const clearButton = document.getElementById("clear_find_button");
@@ -12,20 +15,30 @@ const countButton = document.getElementById("count_button");
 const totalPriceLabel = document.getElementById("total_price");
 const submitButton = document.getElementById("submit_button");
 
+window.addEventListener("DOMContentLoaded", () => {
+  refetchAllDogs();
+});
 let descendingSort = false;
+export const refetchAllDogs = async () => {
+  const allDogs = await getAllDogs();
+  dogs = allDogs;
+  renderItemsList(dogs);
+};
+refetchAllDogs();
 
-searchButton.addEventListener("click", () => {
+searchButton.addEventListener("click", async () => {
   const searchTerm = findInput.value.toLowerCase();
-  const foundDogs = dogs.filter((dog) => {
-    const dogTitle = dog.title.toLowerCase();
-    return dogTitle.includes(searchTerm);
-  });
+  const foundDogs = await searchDogs(searchTerm);
   const sortedDogs = sortSwitch.checked
     ? sortDogsByPrice(foundDogs)
     : foundDogs;
-
   renderItemsList(sortedDogs);
 });
+
+async function searchDogs(term) {
+  const allDogs = await getAllDogs();
+  return allDogs.filter((dog) => dog.title.toLowerCase().includes(term));
+}
 
 clearButton.addEventListener("click", () => {
   clearInputs();
@@ -59,12 +72,17 @@ sortSwitch.addEventListener("change", () => {
 
   const displayedDogsData = Array.from(displayedDogs).map((dogElement) => {
     const dogTitle = dogElement.querySelector(".dog_title")?.textContent.trim();
-    const dogDescription = dogElement.querySelector(".dog_description")?.textContent.trim();
+    const dogDescription = dogElement
+      .querySelector(".dog_description")
+      ?.textContent.trim();
     const dogPriceElement = dogElement.querySelector(".dog_price");
-    const dogPriceText = dogPriceElement ? dogPriceElement.textContent.trim() : "0";
+    const dogPriceText = dogPriceElement
+      ? dogPriceElement.textContent.trim()
+      : "0";
     const dogPrice = parseFloat(dogPriceText.replace("$", ""));
 
     return {
+      id: dogElement.dataset.id,
       title: dogTitle || "",
       description: dogDescription || "",
       price: dogPrice || 0,
@@ -79,7 +97,7 @@ sortSwitch.addEventListener("change", () => {
   renderItemsList(sortedDogs);
 });
 
-submitButton.addEventListener("click", () => {
+submitButton.addEventListener("click", async () => {
   const titleInput = document.getElementById("dog-select");
   const descriptionInput = document.getElementById("description_input");
   const expensesInput = document.getElementById("expenses_input");
@@ -95,25 +113,26 @@ submitButton.addEventListener("click", () => {
       price: price,
     };
 
-    dogs.push(newDog);
-
-    renderItemsList(dogs);
+    await createDog(newDog);
+    loadDogs();
 
     titleInput.value = "";
     descriptionInput.value = "";
     expensesInput.value = "";
-
   } else {
-    alert("Please fill in all fields and ensure that the price is greater than or equal to 1.");
+    alert(
+      "Please fill in all fields and ensure that the price is greater than or equal to 1.",
+    );
   }
 });
-
 
 const itemsContainer = document.getElementById("items_container");
 
 itemsContainer.addEventListener("click", (event) => {
   if (event.target.classList.contains("edit-button")) {
-    const index = Array.from(itemsContainer.querySelectorAll(".edit-button")).indexOf(event.target);
+    const index = Array.from(
+      itemsContainer.querySelectorAll(".edit-button"),
+    ).indexOf(event.target);
     const dogToEdit = dogs[index];
 
     createEditWindow(dogToEdit, index);
@@ -143,7 +162,6 @@ function createEditWindow(dog, index) {
     <button id="submit-edit">Submit Changes</button>
   `;
 
-
   const dogSelect = editWindow.querySelector("#edit-dog-select");
   dogSelect.value = dog.title;
 
@@ -153,35 +171,43 @@ function createEditWindow(dog, index) {
   configureSubmitEditButton(editWindow, index);
 }
 
-function configureSubmitEditButton(editWindow, index) {
+async function configureSubmitEditButton(editWindow, index) {
   const submitEditButton = editWindow.querySelector("#submit-edit");
-  submitEditButton.addEventListener("click", () => {
+  submitEditButton.addEventListener("click", async () => {
     const editedTitle = editWindow.querySelector("#edit-dog-select").value;
-    const editedDescription = editWindow.querySelector("#edit-description").value;
+    const editedDescription =
+      editWindow.querySelector("#edit-description").value;
     const editedPrice = editWindow.querySelector("#edit-price").value;
     const priceInput = editWindow.querySelector("#edit-price");
-  const priceValue = parseInt(priceInput.value);
-  if (priceValue < 1) {
-    alert("Price cannot be less than 1");
-  } else if (isNaN(priceValue)) {
-    alert("Price must be a number");
-  } else if (editedDescription.length < 1) {
-    alert("Description cannot be empty");
-  }
-  else {
-    dogs[index].title = editedTitle;
-    dogs[index].description = editedDescription;
-    dogs[index].price = editedPrice;
+    const priceValue = parseInt(priceInput.value);
 
-    renderItemsList(dogs);
-    editWindow.remove();
-  
-  }
-}
-  );
-}
+    if (priceValue < 1) {
+      alert("Price cannot be less than 1");
+    } else if (isNaN(priceValue)) {
+      alert("Price must be a number");
+    } else if (editedDescription.length < 1) {
+      alert("Description cannot be empty");
+    } else {
+      const updatedDog = {
+        title: editedTitle,
+        description: editedDescription,
+        price: editedPrice,
+      };
 
+      await updateDog(dogs[index].id, updatedDog);
+      loadDogs();
+      editWindow.remove();
+    }
+  });
+}
 
 window.addEventListener("DOMContentLoaded", () => {
-  renderItemsList(stones);
+  renderItemsList(dogs);
 });
+
+async function loadDogs() {
+  const allDogs = await getAllDogs();
+  renderItemsList(allDogs);
+}
+
+window.addEventListener("DOMContentLoaded", loadDogs);

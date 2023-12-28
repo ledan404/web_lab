@@ -18,7 +18,7 @@ export const dogs = [
 
 export const renderItemsList = (dogArray) => {
   const itemsContainer = document.getElementById("items_container");
-  itemsContainer.innerHTML = '';
+  itemsContainer.innerHTML = "";
 
   dogArray.forEach((dog) => {
     const listItem = addItemToPage(dog);
